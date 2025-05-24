@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: ubuntu-container
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    autoDeploy: false
+    branch: main
