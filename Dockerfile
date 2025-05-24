@@ -1,22 +1,20 @@
+ttyd:
+
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies, Python, and basic tools
-RUN apt update && \
-    apt install -y python3 python3-pip curl vim net-tools iputils-ping && \
-    apt clean
+# Install dependencies
+RUN apt update && apt install -y \
+  git cmake g++ libjson-c-dev \
+  libwebsockets-dev libssl-dev make curl bash \
+  && git clone https://github.com/tsl0922/ttyd.git \
+  && cd ttyd && mkdir build && cd build && cmake .. && make && make install
 
-# Create a non-root user
-RUN useradd -ms /bin/bash render && \
-    echo "render ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-# Set working directory
+# Create non-root user
+RUN useradd -ms /bin/bash render
+USER render
 WORKDIR /home/render
 
-# Switch to non-root user
-USER render
-
-# Start a simple web server to keep the container alive
-CMD ["python3", "-m", "http.server", "10000"]
-
+# Start ttyd on port 10000
+CMD ["ttyd", "-p", "10000", "bash"]
